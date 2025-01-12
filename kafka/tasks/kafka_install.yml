@@ -1,0 +1,96 @@
+---
+- name: Install required packages for Kafka
+  apt:
+    name:
+      - openjdk-11-jdk
+      - wget
+    state: present
+  become: yes
+
+- name: Create Kafka directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: kafka
+    group: kafka
+    mode: '0755'
+  loop:
+    - "{{ kafka_install_dir }}"
+    - "{{ kafka_data_dir }}"
+    - "{{ zookeeper_data_dir }}"
+
+- name: Download Kafka archive
+  get_url:
+    url: "{{ kafka_download_url }}"
+    dest: "/tmp/kafka.tgz"
+
+- name: Extract Kafka archive
+  unarchive:
+    src: "/tmp/kafka.tgz"
+    dest: "{{ kafka_install_dir }}"
+    remote_src: yes
+
+- name: Configure Kafka and Zookeeper properties
+  block:
+    - name: Set Kafka server properties from template
+      template:
+        src: kafka_server.properties.j2
+        dest: "{{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/config/server.properties"
+
+    - name: Set Zookeeper properties from template
+      template:
+        src: zookeeper.properties.j2
+        dest: "{{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/config/zookeeper.properties"
+
+- name: Create Kafka systemd service files
+  block:
+    - name: Kafka service
+      copy:
+        dest: /etc/systemd/system/kafka.service
+        content: |
+          [Unit]
+          Description=Apache Kafka
+          After=network.target
+
+          [Service]
+          User=kafka
+          Group=kafka
+          ExecStart={{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/bin/kafka-server-start.sh {{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/config/server.properties
+          ExecStop={{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/bin/kafka-server-stop.sh
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Zookeeper service
+      copy:
+        dest: /etc/systemd/system/zookeeper.service
+        content: |
+          [Unit]
+          Description=Apache Zookeeper
+          After=network.target
+
+          [Service]
+          User=kafka
+          Group=kafka
+          ExecStart={{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/bin/zookeeper-server-start.sh {{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/config/zookeeper.properties
+          ExecStop={{ kafka_install_dir }}/kafka_{{ scala_version }}-{{ kafka_version }}/bin/zookeeper-server-stop.sh
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+
+- name: Enable and start Zookeeper service
+  systemd:
+    name: zookeeper
+    enabled: yes
+    state: started
+
+- name: Enable and start Kafka service
+  systemd:
+    name: kafka
+    enabled: yes
+    state: started
