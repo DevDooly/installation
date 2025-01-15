@@ -5,4 +5,4 @@
 * KAFKA MANAGER (CMAK)
 
 ## 설치 방법
-* ansible-playbook -i ./inventory/hosts kafka.yml
+* ansible-playbook -i inventory/hosts main.yml -v
