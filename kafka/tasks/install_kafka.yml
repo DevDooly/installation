@@ -1,0 +1,25 @@
+---
+- name: Download Kafka binaries
+  get_url:
+    url: "{{ kafka_download_url }}"
+    dest: "/tmp/kafka.tgz"
+
+- name: Extract Kafka binaries
+  unarchive:
+    src: "/tmp/kafka.tgz"
+    dest: "{{ kafka_install_dir }}"
+    remote_src: yes
+
+- name: Create Kafka user and group
+  user:
+    name: kafka
+    shell: /bin/bash
+  group:
+    name: kafka
+
+- name: Set permissions for Kafka
+  file:
+    path: "{{ kafka_install_dir }}"
+    owner: kafka
+    group: kafka
+    recurse: yes

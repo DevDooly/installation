@@ -1,0 +1,19 @@
+---
+- name: Deploy CMAK configuration
+  template:
+    src: cmak.conf.j2
+    dest: "{{ cmak_install_dir }}/conf/application.conf"
+    owner: kafka
+    group: kafka
+
+- name: Deploy CMAK systemd service
+  copy:
+    src: cmak.service
+    dest: /etc/systemd/system/cmak.service
+    mode: 0644
+
+- name: Reload systemd and enable CMAK
+  systemd:
+    name: cmak
+    enabled: yes
+    state: started

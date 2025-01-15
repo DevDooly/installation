@@ -1,0 +1,8 @@
+process.roles=controller,broker
+node.id=1
+controller.quorum.voters=1@localhost:9093
+log.dirs={{ kafka_install_dir }}/logs
+listeners=PLAINTEXT://localhost:9092
+log.retention.hours=168
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000

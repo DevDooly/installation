@@ -1,0 +1,25 @@
+---
+- name: Install required packages for Kafka and CMAK
+  apt:
+    name:
+      - openjdk-11-jdk
+      - wget
+      - curl
+      - net-tools
+      - vim
+      - gzip
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages for Kafka and CMAK (RHEL/CentOS)
+  yum:
+    name:
+      - java-11-openjdk-devel
+      - wget
+      - curl
+      - net-tools
+      - vim
+      - gzip
+    state: present
+  when: ansible_os_family == "RedHat"

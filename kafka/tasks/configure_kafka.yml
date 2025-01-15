@@ -1,0 +1,26 @@
+---
+- name: Deploy server.properties
+  template:
+    src: server.properties.j2
+    dest: "{{ kafka_install_dir }}/config/server.properties"
+    owner: kafka
+    group: kafka
+
+- name: Deploy kafka.properties
+  template:
+    src: kafka.properties.j2
+    dest: "{{ kafka_install_dir }}/config/kafka.properties"
+    owner: kafka
+    group: kafka
+
+- name: Deploy Kafka systemd service
+  copy:
+    src: kafka.service
+    dest: /etc/systemd/system/kafka.service
+    mode: 0644
+
+- name: Reload systemd and enable Kafka
+  systemd:
+    name: kafka
+    enabled: yes
+    state: started
