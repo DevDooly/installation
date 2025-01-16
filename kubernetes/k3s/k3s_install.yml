@@ -1,0 +1,67 @@
+---
+- name: Install K3s on Ubuntu 22.04
+  hosts: all
+  become: yes
+  tasks:
+    # Update and Install Required Packages
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install dependencies
+      apt:
+        name: 
+          - curl
+          - apt-transport-https
+        state: present
+
+    # Install K3s
+    - name: Download and install K3s
+      shell: |
+        curl -sfL https://get.k3s.io | sh -
+      args:
+        executable: /bin/bash
+
+    # Configure kubeconfig for current user
+    - name: Ensure .kube directory exists
+      file:
+        path: ~/.kube
+        state: directory
+        mode: '0755'
+
+    - name: Copy kubeconfig to user home
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~/.kube/config
+        remote_src: yes
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Export kubeconfig path in bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: "export KUBECONFIG=~/.kube/config"
+        create: yes
+
+    - name: Reload bashrc
+      shell: source ~/.bashrc
+
+    # Enable K3s Service
+    - name: Enable and start K3s service
+      systemd:
+        name: k3s
+        enabled: yes
+        state: started
+
+- name: Verify K3s installation
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check Kubernetes nodes
+      command: kubectl get nodes
+      register: kubectl_output
+
+    - debug:
+        var: kubectl_output.stdout
+
