@@ -1,6 +1,14 @@
 # installation
 
 ## mariadb
+
 ## kafka
- - kafka
- - kafka manager
+
+- kafka (KRaft)
+- kafka manager
+
+## Kubernetes
+
+- k3s
+- kubernets HA
+  - windows :: Hyper-V 관리자
