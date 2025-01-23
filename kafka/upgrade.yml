@@ -1,9 +1,0 @@
----
-- hosts: kafka_brokers
-  serial: 1
-  vars_files:
-    - inventory/vars.yml
-  tasks:
-    - include_tasks: tasks/upgrade_kafka_pre.yml
-    - include_tasks: tasks/upgrade_kafka.yml
-    - include_tasks: tasks/upgrade_kafka_post.yml

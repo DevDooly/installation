@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: no
+  vars_files:
+    - "inventory/vars.yml"
+  roles:
+    - install_pre
+
+- hosts: kafka_servers
+  gather_facts: no
+  vars_files:
+    - "inventory/vars.yml"
+  roles:
+    - install_kafka
+
+- hosts: cmak_servers
+  gather_facts: no
+  vars_files:
+    - "inventory/vars.yml"
+  roles:
+    - install_cmak
