@@ -6,16 +6,9 @@
   roles:
     - install_pre
 
-- hosts: kafka_servers
+- hosts: kafka
   gather_facts: no
   vars_files:
     - "inventory/vars.yml"
   roles:
     - install_kafka
-
-- hosts: cmak_servers
-  gather_facts: no
-  vars_files:
-    - "inventory/vars.yml"
-  roles:
-    - install_cmak
