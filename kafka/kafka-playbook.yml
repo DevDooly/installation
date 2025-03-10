@@ -2,13 +2,35 @@
 - hosts: all
   gather_facts: no
   vars_files:
-    - "inventory/vars.yml"
+    - "inventories/{{ profile }}/vars.yml"
   roles:
-    - install_pre
+    - install-pre
 
 - hosts: kafka
+  gather_facts: yes
+  vars_files:
+    - "inventoies/{{ profile }}/vars.yml"
+  roles:
+    - install-kafka
+    - start-kafka
+    - stop-kafka
+    - restart-kafka
+
+- hosts: kafka_ui
+  gather_facts: no
+  var_files:
+    - "inventories/{{ profile }}/vars.yml"
+  roles:
+    - install-kafka-ui
+    - start-kafka-ui
+    - stop-kafka-ui
+    - restart-kafka-ui
+
+- hosts: schema_registry
   gather_facts: no
   vars_files:
-    - "inventory/vars.yml"
+    - "inventories/{{ profile }}/vars.yml"
   roles:
-    - install_kafka
+    - install-schema-registry
+    - stop-schema-registry
+    - start-schema-registry

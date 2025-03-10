@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=kafka
+EnvironmentFile=/opt/kafka/config/kafka-server
 ExecStart={{ kafka_install_dir }}/bin/kafka-server-start.sh {{ kafka_install_dir }}/config/server.properties
 Restart=on-failure
 
