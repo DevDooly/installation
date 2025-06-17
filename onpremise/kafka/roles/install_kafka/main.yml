@@ -1,11 +1,12 @@
 ---
 - name: Create kafka group
-  group:
+  user:
     name: kafka
     state: present
+    group: kafka
 
 - name: Create kafka user
-  user:
+  group:
     name: kafka
     state: present
     group: kafka
@@ -70,32 +71,11 @@
     - log4j.properties.j2
     - server.properties.j2
     - tools-log4j.properties.j2
-    - kafka-server.j2
 
-- name: create log dir
-  file:
-    path: "{{ kafka_install_dir }}/logs"
-    state: directory
-    owner: kafka
-    group: kafka
-    mode: '0755'
-
-- name: link log dir
-  file:
-    src: "{{ kafka_install_dir }}/logs"
-    dest: "/var/log/kafka"
-    state: link
-
-- name: link conf dir
-  file:
-    src: "{{ kafka_install_dir }}/config"
-    dest: "/etc/kafka/config"
-    state: link
-
-- name: systemctl include kafka-server.service
+- name: systemctl include kafka.service
   template:
-    src: kafka-server.service.j2
-    dest: /etc/systemd/system/kafka-server.service
+    src: kafka.service.j2
+    dest: /etc/systemd/system/kafka.service
     owner: root
     group: root
     mode: '0644'
@@ -113,4 +93,4 @@
   shell: systemctl daemon-reload
 
 - name: set enable in systemctl
-  shell: systemctl enable kafka-server --now
+  shell: systemctl enable kafka --now
